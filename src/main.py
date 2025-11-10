@@ -1,19 +1,6 @@
-from dotenv import load_dotenv
-import os
-from langchain_mistralai import ChatMistralAI
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+# src/main.py
 from langchain_core.tools import tool
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
-
-
-
-
-
-
-
-load_dotenv()
+from llm.client import LLM
 
 
 @tool
@@ -38,47 +25,13 @@ def rag(description_poste: str, top_k: int = 5):
 
 tools = [rag, multiply]
 
+# crée notre LLM avec outils
+llm = LLM("mistral-small", tools)
 
-llm = ChatMistralAI(
-    api_key=os.getenv("MISTRAL_API_KEY"),
-    model="mistral-tiny",
-    temperature=0.4,
-)
-
-prompt = ChatPromptTemplate.from_messages([
-    ("system",
-     "Tu es un assistant RH expert en recrutement. "
-     "Si l'utilisateur décrit un poste ou un profil recherché, "
-     "appelle la fonction `rag` pour trouver les meilleurs CV correspondants. "
-     "Sinon, aide-le de manière claire et concise."),
-    MessagesPlaceholder("chat_history"),
-    ("human", "{input}"),
-    MessagesPlaceholder("agent_scratchpad"),
-])
-
-
-agent = create_tool_calling_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-
-store = {}
-
-def get_session_history(session_id: str):
-    if session_id not in store:
-        store[session_id] = InMemoryChatMessageHistory()
-    return store[session_id]
-
-chat_with_memory = RunnableWithMessageHistory(
-    agent_executor,
-    get_session_history,
-    input_messages_key="input",
-    history_messages_key="chat_history",
-)
-
+chat_with_memory = llm.get2()
+session_id = llm.get1()
 
 print("Assistant RH prêt à discuter! (tape 'quit' pour quitter)\n")
-
-session_id = "rh_session"
 
 while True:
     user_input = input("Vous : ")
@@ -86,7 +39,6 @@ while True:
         print("Fin.")
         break
 
-    
     response = chat_with_memory.invoke(
         {"input": user_input},
         config={"configurable": {"session_id": session_id}},
