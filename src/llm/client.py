@@ -57,8 +57,8 @@ class LLM:
 
         self.session_id = "rh_session"
 
-    def get1(self):
+    def getSession_id(self):
         return self.session_id
 
-    def get2(self):
+    def getChat_with_memory(self):
         return self.chat_with_memory

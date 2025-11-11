@@ -1,47 +1,47 @@
-# src/main.py
 from langchain_core.tools import tool
 from llm.client import LLM
+from retrieval.retriever import rag
+from pipeline.rag_pipeline  import RAGPipeline  
 
 
-@tool
-def multiply(a: int, b: int) -> int:
-    """Multiplie deux entiers."""
-    return a * b
 
-@tool
-def rag(description_poste: str, top_k: int = 5):
-    """
-    Recherche les CV les plus pertinents pour une description de poste donnée.
-    Retourne une liste des meilleurs candidats trouvés.
-    """
-    res = (
-        "Voilà, Houssam est le meilleur ingénieur : "
-        "expert en Python, Java et architecture logicielle."
-    )
-    return {
-        "description_poste": description_poste,
-        "top_profils": res
-    }
 
-tools = [rag, multiply]
+def initVectorDataBase():
+    pipeline = RAGPipeline(base_path="/home/moussaoui/langchain-chatbot/data/data",model_name="all-MiniLM-L6-v2",vector_db="qdrant")
+    pipeline.run()
 
-# crée notre LLM avec outils
-llm = LLM("mistral-small", tools)
 
-chat_with_memory = llm.get2()
-session_id = llm.get1()
+def runLLM():
 
-print("Assistant RH prêt à discuter! (tape 'quit' pour quitter)\n")
+    tools = [rag]
+    llm = LLM("mistral-small", tools)
 
-while True:
-    user_input = input("Vous : ")
-    if user_input.lower() in ["quit", "exit"]:
-        print("Fin.")
-        break
+    chat_with_memory = llm.getChat_with_memory()
+    session_id = llm.getSession_id()
 
-    response = chat_with_memory.invoke(
-        {"input": user_input},
-        config={"configurable": {"session_id": session_id}},
-    )
+    print("Assistant RH prêt à discuter! (tape 'quit' pour quitter)\n")
 
-    print("Assistant RH :", response["output"])
+    while True:
+        user_input = input("Vous : ")
+        if user_input.lower() in ["quit", "exit"]:
+            print("Fin.")
+            break
+
+        response = chat_with_memory.invoke(
+            {"input": user_input},
+            config={"configurable": {"session_id": session_id}},
+        )
+
+        print("Assistant RH :", response["output"])
+
+
+
+
+
+def main():
+    # initVectorDataBase() #ceci doit etre lancé juste une seule fois pour intialiser la base vectoreil 
+
+    runLLM()
+
+
+main()
