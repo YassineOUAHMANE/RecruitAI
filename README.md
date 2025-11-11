@@ -5,8 +5,7 @@
 ### 1. Créer l’environnement virtuel et installer les dépendances
 ```bash
 python3 -m venv venv
-source venv/bin/activate  # Sur Linux/Mac
-# venv\Scripts\activate   # Sur Windows
+source venv/bin/activate  
 pip install -r requirements.txt
 ```
 
