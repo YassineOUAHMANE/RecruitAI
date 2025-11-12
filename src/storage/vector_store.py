@@ -1,6 +1,7 @@
 from qdrant_client import QdrantClient
 import numpy as np
 from qdrant_client.models import Distance, VectorParams ,PointStruct
+from config.settings import settings
 
 class VectorStore:
 
@@ -16,14 +17,14 @@ class VectorStore:
            
             print("on travaille avec Qdrant")
 
-            coll_name = "ResumeVectorBase"
-            http_port, grpc_port = 6338, 6336
-            
+            coll_name = settings.QDRANT_COLLECTION
+
             client = QdrantClient(
-                url=f"http://localhost:{http_port}",
-                prefer_grpc=True,
-                grpc_port=grpc_port,
-                timeout=60.0,    # 60s pour les grosses opérations
+            host = settings.QDRANT_HOST, 
+            port = settings.QDRANT_PORT,
+            prefer_grpc = True, 
+            grpc_port = settings.QDRANT_GRPC_PORT, 
+            timeout = 60.0
             )
 
             self.client = client

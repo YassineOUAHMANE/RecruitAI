@@ -1,17 +1,24 @@
-from langchain_core.tools import tool
+from langchain.tools import tool
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 import numpy as np
 from embeddings.embedder import Embedder
+from config.settings import settings
 
 
 class Retriever:
 
 
-    def __init__(self, collection_name="ResumeVectorBase", model_name="all-MiniLM-L6-v2"):
+    def __init__(self, collection_name= settings.QDRANT_COLLECTION, model_name="all-MiniLM-L6-v2"):
         self.collection_name = collection_name
         self.model_name = model_name
-        self.client = QdrantClient(url="http://localhost:6333",prefer_grpc=True,grpc_port=6336,timeout=60.0)
+        self.client = QdrantClient(
+            host = settings.QDRANT_HOST,
+            port = settings.QDRANT_PORT,
+            prefer_grpc = True, 
+            grpc_port = settings.QDRANT_GRPC_PORT, 
+            timeout = 60.0
+            )
 
         self.embedder = Embedder(model_embedding=self.model_name)
 
@@ -23,7 +30,7 @@ class Retriever:
         Retourne une liste des meilleurs candidats trouvés.
         """
 
-        query_vector = self.embedder.encodeText(query).astype(np.float32).tolist()
+        query_vector = self.embedder.encodeText(query).tolist()
 
         # filtre par type
         qdrant_filter = None
@@ -52,16 +59,24 @@ class Retriever:
 
         return matches
 
-
-
-
 retriever = Retriever()
 
 @tool
 def rag(description_poste: str, top_k: int = 5, category: str = None):
-    """Recherche les CV les plus pertinents pour une description de poste donnée."""
+    """Recherche les CV les plus pertinents pour une description de poste donnée.
 
+    Args:
+        description_poste: description de l'offre d'emploi ou du poste
+        top_k: nombre de CV renvoyés, par défaut 5 si la personne ne le précise pas
+        category: la catégorie visée par l'offre
+    """
     
+    #print("appel de Rag \n")
+
+    #print(description_poste, "\n")
+    #print(top_k, "\n")
+    #print(category, "\n")
+
     results = retriever.search(description_poste, top_k=top_k, category=category)
 
     if not results:
@@ -71,6 +86,8 @@ def rag(description_poste: str, top_k: int = 5, category: str = None):
         f"- [{r['category']}] (score={r['score']}) : {r['text_preview']}"
         for r in results
     ])
+
+    #print("profile texts :", profils_text, "\n")
 
     return {
         "description_poste": description_poste,

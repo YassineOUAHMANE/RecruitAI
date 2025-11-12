@@ -1,64 +1,50 @@
 # src/llm/client.py
-from dotenv import load_dotenv
-import os
 
 from langchain_mistralai import ChatMistralAI
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_core.chat_history import InMemoryChatMessageHistory
-from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain.messages import HumanMessage, AIMessage
+from langchain.agents import create_agent
+from langgraph.checkpoint.memory import InMemorySaver
+import os
+from dotenv import load_dotenv
 
 load_dotenv()
 
-
 class LLM:
-    def __init__(self, model: str, tools: list):
-        self.model_name = model
-        self.tools = tools
 
-        # 1) modèle Mistral
+    def __init__(self, tools : list, model_name = "mistral-large-latest", temperature = 0.3):
+        self.model_name = model_name
+        self.tools = tools
+        self.temperature = temperature
+        
+        # llm Mistral
         llm = ChatMistralAI(
             api_key=os.getenv("MISTRAL_API_KEY"),
             model=self.model_name,
-            temperature=0.4,
-            
+            temperature=self.temperature
         )
 
-        # 2) prompt
-        prompt = ChatPromptTemplate.from_messages([
-            ("system",
-            "Tu es un assistant RH expert en recrutement. "
-            "Si l'utilisateur décrit un poste ou un profil recherché, "
-            "appelle la fonction `rag` pour trouver les meilleurs CV correspondants. "
-            "Sinon, aide-le de manière claire et concise."),
-            MessagesPlaceholder("chat_history"),
-            ("human", "{input}"),
-            MessagesPlaceholder("agent_scratchpad"),
-        ])
+        prompt = "Tu es un assistant RH expert en recrutement. Si l'utilisateur décrit un poste ou un profil recherché, résume les informations qu'il te donne et appelle la fonction `rag` pour trouver les meilleurs CV correspondants. Sinon, aide-le de manière claire et concise. Voici la liste des catégories que tu peux utiliser pour la fonction rag : accountant, advocate, agriculture, apparel, arts, automobile, aviation, banking, bpo, buisiness-development, chef, construction, consultant, designer, digital-media, engineering, finance, fitness, healthcare, hr, information-technology, public-relations, sales, teacher"
 
-        # 3) agent
-        agent = create_tool_calling_agent(llm, tools, prompt)
-        agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+        # agent
+        self.agent = create_agent(
+            model = llm,
+            tools = self.tools,
+            system_prompt= prompt,
+            checkpointer = InMemorySaver()
+            )
+        
+        # historique des messages
+        self.messages = []
+        
+    def get_agent(self):
+        return self.agent
+    
 
-        # 4) mémoire de session
-        store = {}
+    def get_messages(self):
+        return self.messages
+    
+    def add_input_to_messages(self, input):
+        self.messages.append(HumanMessage(input))
 
-        def get_session_history(session_id: str):
-            if session_id not in store:
-                store[session_id] = InMemoryChatMessageHistory()
-            return store[session_id]
-
-        self.chat_with_memory = RunnableWithMessageHistory(
-            agent_executor,
-            get_session_history,
-            input_messages_key="input",
-            history_messages_key="chat_history",
-        )
-
-        self.session_id = "rh_session"
-
-    def getSession_id(self):
-        return self.session_id
-
-    def getChat_with_memory(self):
-        return self.chat_with_memory
+    def add_response_to_messages(self, response):
+        self.messages.append(AIMessage(response))
