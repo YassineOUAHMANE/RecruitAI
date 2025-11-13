@@ -7,4 +7,4 @@ numpy>=1.24.0
 scikit-learn>=1.2.0
 scipy>=1.10.0
 qdrant-client>=1.11.0
-dotenv>=1.2.1
+python-dotenv>=1.0.0
