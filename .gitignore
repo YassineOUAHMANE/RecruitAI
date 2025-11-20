@@ -1,2 +1,36 @@
+# Python environment
 .venv
 .env
+*.pyc
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.coverage
+
+# Data files (heavy)
+src/data/
+src/qdrant_storage/
+
+# Logs
+*.log
+init.log
+
+# Model files
+*.pkl
+classifier.pkl
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+.cache/
