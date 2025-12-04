@@ -21,6 +21,6 @@ class UploadService():
 
     def get_file_path(self,id):
         file=self.files_dao.get(id)
-        return f"{UPLOAD_DIR}/{file["filepath"]}" if file else None
+        return f"{UPLOAD_DIR}/{file['filepath']}" if file else None
 
         

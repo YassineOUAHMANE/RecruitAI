@@ -1,4 +1,5 @@
-from fastapi import APIRouter, File, UploadFile,Query,FileResponse
+from fastapi import APIRouter, File, UploadFile,Query
+from starlette.responses import FileResponse
 
 class UploadController():
     def __init__(self,upload_service):
