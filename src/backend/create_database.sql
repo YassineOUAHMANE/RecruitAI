@@ -25,6 +25,6 @@ CREATE TABLE conversation_text (
 CREATE TABLE files_in_text (
     text_id INT NOT NULL,
     file_id INT NOT NULL,
-    FOREIGN KEY (text_id) REFERENCES conversation_text(id)
+    FOREIGN KEY (text_id) REFERENCES conversation_text(id),
     FOREIGN KEY (file_id) REFERENCES files(id)
 );

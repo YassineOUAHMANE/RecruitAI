@@ -4,6 +4,9 @@ db = mysql.connector.connect(
     host="localhost",
     user="root",
     password="password",
-    database="mydb"
+    database="recruit_AI"
 )
+
+if db.is_connected():
+    print("db connected successfully")
 

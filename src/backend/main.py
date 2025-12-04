@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
-import mysql.connector
 import os
 
 from dao.conversations_dao import ConversationDAO
@@ -40,5 +39,5 @@ app.include_router(conversation_controller.router_api, prefix="/api")
 app.include_router(upload_controller.router_api, prefix="/api")
 
 
-app.mount("/", StaticFiles(directory="build"), name="frontend") # pour les fichier frontend
+# app.mount("/", StaticFiles(directory="build"), name="frontend") # pour les fichier frontend
 
