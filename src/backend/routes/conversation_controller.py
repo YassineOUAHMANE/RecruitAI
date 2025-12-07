@@ -8,6 +8,7 @@ class ConversationController():
         self.router_api.add_api_route("/conversation/{id}",self.load_conversation,methods=["GET"])
         self.router_api.add_api_route("/conversation/{id}",self.send_message_to_ai,methods=["POST"])
         self.router_api.add_api_route("/conversation/",self.create_conversation,methods=["PUT"])
+        self.router_api.add_api_route("/conversation/",self.load_all,methods=["GET"])
  
 
     def load_conversation(self,id:int,offset: Optional[int] = Query(None, ge=0)):
@@ -23,6 +24,11 @@ class ConversationController():
         data=await request.json()
         ai_response=self.conversation_service.create_conversation(data["text"])
         return {"message":ai_response if ai_response else "failed to generate AI response"}
+    
+    def load_all(self):
+        data=self.conversation_service.get_all_conversations()
+        return {"message":data}
+
 
 
 

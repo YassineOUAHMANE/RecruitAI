@@ -45,4 +45,12 @@ class ConversationService():
 
     def create_conversation(self,user_input):
         id=self.conversation_dao.save()
-        return self.process_user_message(id,user_input)
+        response=self.process_user_message(id,user_input)
+        if response:
+            return {"id":id,"response":response}
+        else:
+            return None
+    
+    def get_all_conversations(self):
+        data=self.conversation_dao.find_all()
+        return data

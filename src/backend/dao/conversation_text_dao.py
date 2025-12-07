@@ -1,20 +1,24 @@
 
 class ConversationTextDAO():
     def __init__(self,db):
-        self.db=db
+        self.db_factory=db
 
     def save(self,conversation_id,text,sent_by_AI):
-        cursor = self.db.cursor()
+        db=self.db_factory()
+        cursor = db.cursor()
         cursor.execute(
             "INSERT INTO conversation_text (sent_by_AI,text,conversation_id) VALUES (%s,%s,%s)",
             (sent_by_AI,text,conversation_id)
         )
-        self.db.commit()
+        db.commit()
+        cursor.close()
+        db.close() 
         return cursor.lastrowid
     def list_by_conversation_id(self,conversation_id,offset=0,limit=10):
         limit=int(limit)
         offset=int(offset)
-        cursor = self.db.cursor(dictionary=True)
+        db=self.db_factory()
+        cursor = db.cursor(dictionary=True)
         cursor.execute(
             f"""
             SELECT 
@@ -33,10 +37,13 @@ class ConversationTextDAO():
             (conversation_id,)
         )
         rows = cursor.fetchall()
+        cursor.close()
+        db.close() 
         return rows
     
     def get_by_text_id(self,text_id):
-        cursor = self.db.cursor(dictionary=True)
+        db=self.db_factory()
+        cursor = db.cursor(dictionary=True)
         cursor.execute(
             f"""
             SELECT 
@@ -53,5 +60,7 @@ class ConversationTextDAO():
             (text_id,)
         )
         row = cursor.fetchone()
+        cursor.close()
+        db.close() 
         return row
     

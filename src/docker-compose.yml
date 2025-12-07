@@ -1,6 +1,6 @@
 services:
   api:
-    build: .
+    build: ./backend
     container_name: fastapi_app
     restart: always
     ports:
@@ -24,7 +24,16 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./create_database.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./backend/create_database.sql:/docker-entrypoint-initdb.d/init.sql
+
+  frontend:
+    build: ./frontend
+    container_name: react_frontend
+    restart: always
+    ports:
+      - "8001:80"
+    depends_on:
+      - api
 
 volumes:
   db_data:
