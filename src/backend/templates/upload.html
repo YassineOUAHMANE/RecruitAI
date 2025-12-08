@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload CV</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+<h2>Upload ton CV</h2>
+
+<form id="cvForm" enctype="multipart/form-data">
+    <input type="file" name="file" accept=".pdf" required>
+    <button type="submit">Envoyer</button>
+</form>
+
+<div id="result"></div>
+
+<script>
+document.getElementById("cvForm").onsubmit = async (e) => {
+    e.preventDefault();
+
+    const form = new FormData(e.target);
+
+    const res = await fetch("/api/upload", {
+        method: "POST",
+        body: form
+    });
+
+    const data = await res.json();
+
+    document.getElementById("result").innerHTML =
+        "<p>📄 CV uploadé : " + data.message + "</p>";
+};
+</script>
+
+</body>
+</html>

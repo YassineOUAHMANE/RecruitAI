@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>RecruitAI – Chatbot</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body class="chat-body">
+
+<a href="/history" class="history-btn">📜 Historique</a>
+
+<h1 class="chat-title">RecruitAI – Chatbot</h1>
+
+<div id="chat-container" class="glass-card">
+    <div id="chatbox"></div>
+</div>
+
+<div class="input-area glass-card">
+    <input id="userInput" type="text" placeholder="Écris un message..." autocomplete="off">
+    <button onclick="sendMessage()">Envoyer</button>
+</div>
+
+<script src="/static/chat.js"></script>
+</body>
+</html>

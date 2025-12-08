@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   api:
     build: ./backend
@@ -6,12 +8,32 @@ services:
     ports:
       - "8000:8000"
     environment:
+      # DATABASE
       DB_HOST: db
       DB_USER: root
       DB_PASSWORD: rootpassword
       DB_NAME: recruit_AI
+
+      # LLM / LangChain
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_PROJECT: ${LANGCHAIN_PROJECT}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+
+      # QDRANT CONFIG
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      QDRANT_GRPC_PORT: 6334
+      QDRANT_COLLECTION: ResumeVectorBase
+
+      # PATH des fichiers d’ingestion
+      DATA_PATH: /app/data
+
     depends_on:
       - db
+      - qdrant
+    volumes:
+      - ./backend/data:/app/data  # !!! Le dossier où tu as mis tes CV
 
   db:
     image: mysql:8
@@ -26,6 +48,16 @@ services:
       - db_data:/var/lib/mysql
       - ./backend/create_database.sql:/docker-entrypoint-initdb.d/init.sql
 
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"    # HTTP
+      - "6334:6334"    # gRPC
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
   frontend:
     build: ./frontend
     container_name: react_frontend
@@ -37,3 +69,4 @@ services:
 
 volumes:
   db_data:
+  qdrant_storage:

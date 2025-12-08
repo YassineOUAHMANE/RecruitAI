@@ -1,17 +1,16 @@
 from typing import Optional
 
 #pour tester seulement
-from mock_llm import LLMClient
 
 class ConversationService():
     def __init__(self,conversation_dao,conversation_text_dao,llm_client,file_in_text_dao):
         self.conversation_dao=conversation_dao
         self.conversation_text_dao=conversation_text_dao
         self.file_in_text_dao=file_in_text_dao
-        #self.llm_client=llm_client
+        self.llm_client=llm_client
         #pour tester seulement
-        self.mock_llm=LLMClient()
-        self.llm_client=self.mock_llm
+        # self.mock_llm=LLMClient()
+        # self.llm_client=self.mock_llm
 
     def get_conversation(self,id,offset: Optional[int] = None):
         conversation_time=self.conversation_dao.get(id)
@@ -40,8 +39,17 @@ class ConversationService():
         for file in response["files"]:
             self.file_in_text_dao.save(text_id,file["file_id"])
         result=self.conversation_text_dao.get_by_text_id(text_id)
-        result["file_ids"]=result["file_ids"].split(",")
+        #result["file_ids"]=result["file_ids"].split(",")
+        
+        file_ids = result.get("file_ids")
+
+        if file_ids:
+            result["file_ids"] = file_ids.split(",")
+        else:
+            result["file_ids"] = []
+
         return result
+
 
     def create_conversation(self,user_input):
         id=self.conversation_dao.save()

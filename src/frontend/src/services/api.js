@@ -1,13 +1,14 @@
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export const uploadCV = async (file) => {
   const formData = new FormData();
   formData.append('file', file);
-
+  
   const response = await fetch(`${API_BASE}/upload`, {
     method: 'POST',
     body: formData,
   });
+  
   const data = await response.json();
   return data.message === 'success';
 };
@@ -34,6 +35,7 @@ export const sendMessage = async (conversationId, text) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
   });
+  
   const data = await response.json();
   return data.message;
 };
@@ -44,6 +46,7 @@ export const createConversation = async (text) => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ text }),
   });
+  
   const data = await response.json();
   return data.message;
 };

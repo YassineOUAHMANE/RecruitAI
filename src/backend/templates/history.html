@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Historique – RecruitAI</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body class="chat-body">
+
+<h1 class="chat-title">Historique des conversations</h1>
+
+<div id="history-container">
+    <ul id="conversation-list"></ul>
+</div>
+
+<script>
+async function loadHistory() {
+    const res = await fetch("/api/conversation/");
+    const data = await res.json();
+
+    const list = document.getElementById("conversation-list");
+    list.innerHTML = "";
+
+    if (!data.message || data.message.length === 0) {
+        list.innerHTML = "<li>Aucune conversation trouvée.</li>";
+        return;
+    }
+
+    data.message.forEach(conv => {
+        const li = document.createElement("li");
+        li.className = "history-item glass-card";
+
+        li.innerHTML = `
+            <strong>💬 Conversation #${conv.id}</strong><br>
+            ⏱️ Début : ${conv.started_at}<br>
+            🔄 Dernière mise à jour : ${conv.updated_at}
+        `;
+
+        li.onclick = () => window.location.href = "/chat?id=" + conv.id;
+
+        list.appendChild(li);
+    });
+}
+
+loadHistory();
+</script>
+
+</body>
+</html>
