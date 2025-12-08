@@ -58,14 +58,7 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
-  frontend:
-    build: ./frontend
-    container_name: react_frontend
-    restart: always
-    ports:
-      - "8001:80"
-    depends_on:
-      - api
+
 
 volumes:
   db_data:
