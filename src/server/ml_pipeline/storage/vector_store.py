@@ -1,7 +1,7 @@
 from qdrant_client import QdrantClient
 import numpy as np
 from qdrant_client.models import Distance, VectorParams ,PointStruct
-from config.settings import settings
+from ml_pipeline.config.settings import settings
 
 class VectorStore:
 
@@ -47,7 +47,23 @@ class VectorStore:
             print("ERREUR   :: pas encore implémenté ce type de database !!")
 
 
-
+    def add_vector(self,data,vector):
+        item=data
+        point = PointStruct(
+            id=item["id"],
+            vector=np.array(vector, dtype=np.float32).tolist(),
+            payload={
+                "text": item["text"],
+                "category": item["category"]
+            }
+        )
+        client, collection_name = self.get_backend()
+        batch=[point]
+        client.upsert(
+                collection_name=collection_name,
+                points=batch,
+                wait=True
+        )
 
 
     def add_vectors(self, data_items: list[dict], vectors: list[np.ndarray]):

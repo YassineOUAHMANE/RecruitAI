@@ -1,4 +1,0 @@
-fastapi
-uvicorn[standard]
-mysql-connector-python
-python-multipart

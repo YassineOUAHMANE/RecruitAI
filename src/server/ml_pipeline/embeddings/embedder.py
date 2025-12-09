@@ -1,7 +1,7 @@
 from qdrant_client import QdrantClient
 from sentence_transformers import SentenceTransformer
 
-from config.settings import settings
+from ml_pipeline.config.settings import settings
 
 
 class Embedder():

@@ -1,6 +1,5 @@
 from pathlib import Path
 from typing import List, Dict
-import uuid
 from PyPDF2 import PdfReader
 
 
@@ -17,6 +16,15 @@ class ResumeParser:
         return text.strip()
 
 
+    def parse_one(self,id,pdf_file):
+        text = self._extract_text(pdf_file)
+        if not text:
+           return
+        return{
+            "id": id,  
+            "category": "unkown",     # au lieu de unkown on peut appeler le classifier pour retrouver la category
+            "text": text                               
+        }
     def parse(self) -> List[Dict]:
         results = []
 

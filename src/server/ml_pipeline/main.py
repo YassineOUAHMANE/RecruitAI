@@ -1,7 +1,7 @@
-from retrieval.retriever import rag
-from pipeline.rag_pipeline  import RAGPipeline
-from llm.client import LLM  
-from config.settings import settings
+from ml_pipeline.retrieval.retriever import rag
+from ml_pipeline.pipeline.rag_pipeline  import RAGPipeline
+from ml_pipeline.llm.client import LLM  
+from ml_pipeline.config.settings import settings
 
 def initVectorDataBase():
     pipeline = RAGPipeline(base_path = settings.DATA_PATH, model_embedding="all-MiniLM-L6-v2",vector_db="qdrant")

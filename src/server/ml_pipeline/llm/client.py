@@ -1,5 +1,7 @@
 # src/llm/client.py
+from json import loads
 
+from ml_pipeline.retrieval.retriever import rag
 from langchain_mistralai import ChatMistralAI
 from langchain.messages import HumanMessage, AIMessage
 from langchain.agents import create_agent
@@ -48,3 +50,28 @@ class LLM:
 
     def add_response_to_messages(self, response):
         self.messages.append(AIMessage(response))
+
+class llm_client:
+    def __init__(self):
+        tools=[rag]
+        llm = LLM(tools, "mistral-large-latest")
+
+        self.agent = llm.get_agent()
+    def call_llm(self,user_input):
+
+
+        response = self.agent.invoke({
+            "messages": [
+                {"role": "user", "content": user_input},
+            ]
+        },
+        {
+            "configurable": {"thread_id": "1"}
+        })
+        cv_ids=[]
+        for msg in response["messages"]:
+            if msg.type == "tool": 
+                tool_result = loads(msg.content)
+                cv_ids = tool_result.get("cv_ids")
+                break 
+        return {"text":response["messages"][-1].content,"files":cv_ids}

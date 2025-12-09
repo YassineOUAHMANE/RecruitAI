@@ -2,8 +2,8 @@ from langchain.tools import tool
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 import numpy as np
-from embeddings.embedder import Embedder
-from config.settings import settings
+from ml_pipeline.embeddings.embedder import Embedder
+from ml_pipeline.config.settings import settings
 
 
 class Retriever:
@@ -90,6 +90,7 @@ def rag(description_poste: str, top_k: int = 5, category: str = None):
     #print("profile texts :", profils_text, "\n")
 
     return {
+        "cv_ids": [r["id"] for r in results],
         "description_poste": description_poste,
         "top_profils": profils_text
     }

@@ -22,5 +22,13 @@ class RAGPipeline:
 
         self.store.add_vectors(data, vectors)
 
+    def add_file(self,id,path):
+        data = self.parser.parse_one(id,path)
+
+        text = [data["text"]]
+        vectors = self.embedder.encodeBatch(text)
+
+        self.store.add_vector(data, vectors[0])
+
 
     

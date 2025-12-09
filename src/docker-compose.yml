@@ -1,6 +1,6 @@
 services:
   api:
-    build: ./backend
+    build: ./server
     container_name: fastapi_app
     restart: always
     ports:

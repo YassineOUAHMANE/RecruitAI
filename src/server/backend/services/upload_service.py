@@ -1,7 +1,7 @@
 from fastapi import File, UploadFile
 import random
 import string
-from const import UPLOAD_DIR 
+from backend.const import UPLOAD_DIR 
 
 class UploadService():
     def __init__(self,files_dao):
