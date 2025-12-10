@@ -87,21 +87,17 @@ class llm_client:
             {"configurable": {"thread_id": "1"}}
         )
 
-
-        tool_messages = [
-            msg for msg in response["messages"] 
-            if msg.type == "tool"
-        ]
-
         cv_ids = []
 
         for msg in response["messages"]:
-            if msg.type == "tool":
-                tool_data = loads(msg.content)
-                if tool_data.get("message_id") == message_id:
-                    cv_ids = tool_data.get("cv_ids", [])
-                    break
-
+            if msg.type == "tool" and msg.content: #Check if content exists
+                try:
+                    tool_data = loads(msg.content)
+                    if tool_data.get("message_id") == message_id:
+                        cv_ids = tool_data.get("cv_ids", [])
+                        break
+                except:
+                    pass  # Ignore parsing errors silently
 
         if cv_ids is None:
             cv_ids = []
