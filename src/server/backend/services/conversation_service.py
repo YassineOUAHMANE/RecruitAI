@@ -56,6 +56,15 @@ class ConversationService():
         else:
             return None
     
+    def create_conversation_from_file(self, file_id, prompt):
+        """Create a conversation and process the uploaded CV"""
+        id=self.conversation_dao.save()
+        response=self.process_user_message(id, prompt)
+        if response:
+            return {"id":id,"response":response}
+        else:
+            return None
+    
     def get_all_conversations(self):
         data=self.conversation_dao.find_all()
         return data
