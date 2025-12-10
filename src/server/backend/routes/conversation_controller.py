@@ -8,6 +8,7 @@ class ConversationController():
         self.router_api.add_api_route("/conversation/{id}",self.load_conversation,methods=["GET"])
         self.router_api.add_api_route("/conversation/{id}",self.send_message_to_ai,methods=["POST"])
         self.router_api.add_api_route("/conversation/",self.create_conversation,methods=["PUT"])
+        self.router_api.add_api_route("/conversation/from-file",self.create_from_file,methods=["POST"])
         self.router_api.add_api_route("/conversation/",self.load_all,methods=["GET"])
  
 
@@ -24,6 +25,13 @@ class ConversationController():
         data=await request.json()
         ai_response=self.conversation_service.create_conversation(data["text"])
         return {"message":ai_response if ai_response else "failed to generate AI response"}
+    
+    async def create_from_file(self,request: Request):
+        data=await request.json()
+        file_id=data.get("file_id")
+        prompt=data.get("prompt", "Analyze this CV")
+        result=self.conversation_service.create_conversation_from_file(file_id, prompt)
+        return {"message":result if result else "failed to create conversation from file"}
     
     def load_all(self):
         data=self.conversation_service.get_all_conversations()
