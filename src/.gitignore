@@ -1,2 +1,19 @@
 server/venv
 **/pycache/
+
+# Heavy data files
+uploads/
+qdrant_storage/
+classification/
+
+# Development files
+*.pkl
+main_enhanced.py
+
+# Environment
+.env.local
+.DS_Store
+*.log
+__pycache__/
+.vscode/
+.idea/
