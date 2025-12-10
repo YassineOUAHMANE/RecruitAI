@@ -29,6 +29,7 @@ services:
 
     volumes:
       - ./server/backend/data:/app/data
+      - ./uploads:/app/uploads
 
   db:
     image: mysql:8
