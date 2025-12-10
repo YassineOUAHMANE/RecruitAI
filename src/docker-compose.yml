@@ -10,8 +10,25 @@ services:
       DB_USER: root
       DB_PASSWORD: rootpassword
       DB_NAME: recruit_AI
+      
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY}
+      LANGCHAIN_API_KEY: ${LANGCHAIN_API_KEY}
+      LANGCHAIN_PROJECT: ${LANGCHAIN_PROJECT}
+      LANGCHAIN_TRACING_V2: ${LANGCHAIN_TRACING_V2}
+
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      QDRANT_GRPC_PORT: 6334
+      QDRANT_COLLECTION: ResumeVectorBase
+
+      DATA_PATH: /app/data
+
     depends_on:
       - db
+      - qdrant
+
+    volumes:
+      - ./server/backend/data:/app/data
 
   db:
     image: mysql:8
@@ -24,7 +41,7 @@ services:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
-      - ./backend/create_database.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./server/backend/create_database.sql:/docker-entrypoint-initdb.d/init.sql
 
   frontend:
     build: ./frontend
@@ -35,5 +52,16 @@ services:
     depends_on:
       - api
 
+  qdrant:
+    image: qdrant/qdrant
+    container_name: qdrant
+    restart: always
+    ports:
+      - "6333:6333"    
+      - "6334:6334"    
+    volumes:
+      - qdrant_storage:/qdrant/storage
+
 volumes:
   db_data:
+  qdrant_storage:

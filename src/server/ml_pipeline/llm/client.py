@@ -1,6 +1,6 @@
 # src/llm/client.py
 from json import loads
-
+import uuid
 from ml_pipeline.retrieval.retriever import rag
 from langchain_mistralai import ChatMistralAI
 from langchain.messages import HumanMessage, AIMessage
@@ -8,6 +8,11 @@ from langchain.agents import create_agent
 from langgraph.checkpoint.memory import InMemorySaver
 import os
 from dotenv import load_dotenv
+
+from ml_pipeline.pipeline.rag_pipeline  import RAGPipeline
+from ml_pipeline.config.settings import settings
+
+from qdrant_client import QdrantClient
 
 load_dotenv()
 
@@ -50,28 +55,59 @@ class LLM:
 
     def add_response_to_messages(self, response):
         self.messages.append(AIMessage(response))
+        
+        
+
 
 class llm_client:
     def __init__(self):
+        
+
+        
+
         tools=[rag]
         llm = LLM(tools, "mistral-large-latest")
 
         self.agent = llm.get_agent()
-    def call_llm(self,user_input):
 
 
-        response = self.agent.invoke({
-            "messages": [
-                {"role": "user", "content": user_input},
-            ]
-        },
-        {
-            "configurable": {"thread_id": "1"}
-        })
-        cv_ids=[]
+
+
+    def call_llm(self, user_input):
+
+        message_id = str(uuid.uuid4())
+
+        response = self.agent.invoke(
+            {
+                "messages": [
+                    {"role": "system", "content": f"message_id={message_id}"},
+                    {"role": "user", "content": user_input}
+                ]
+            },
+            {"configurable": {"thread_id": "1"}}
+        )
+
+
+        tool_messages = [
+            msg for msg in response["messages"] 
+            if msg.type == "tool"
+        ]
+
+        cv_ids = []
+
         for msg in response["messages"]:
-            if msg.type == "tool": 
-                tool_result = loads(msg.content)
-                cv_ids = tool_result.get("cv_ids")
-                break 
-        return {"text":response["messages"][-1].content,"files":cv_ids}
+            if msg.type == "tool":
+                tool_data = loads(msg.content)
+                if tool_data.get("message_id") == message_id:
+                    cv_ids = tool_data.get("cv_ids", [])
+                    break
+
+
+        if cv_ids is None:
+            cv_ids = []
+
+        return {
+            "text": response["messages"][-1].content,
+            "files": cv_ids
+        }
+

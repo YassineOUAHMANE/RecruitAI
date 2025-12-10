@@ -18,9 +18,10 @@ from backend.config import get_db
 from backend.const import UPLOAD_DIR
 
 from ml_pipeline.llm.client import llm_client
+from ml_pipeline.ingestion.single_ingestor import SingleCVIngestor
 
 
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs("./uploads", exist_ok=True)
 
 
 
@@ -30,8 +31,10 @@ files_dao = FilesDAO(get_db)
 files_in_text_dao = FilesInTextDAO(get_db)
 
 llm_client_instance = llm_client() # ici on doit mettre le client llm
+ingestor=SingleCVIngestor()
+
 conversation_service = ConversationService(conversation_dao, conversation_text_dao, llm_client_instance, files_in_text_dao)
-upload_service = UploadService(files_dao)
+upload_service = UploadService(files_dao,ingestor)
 
 
 conversation_controller = ConversationController(conversation_service)

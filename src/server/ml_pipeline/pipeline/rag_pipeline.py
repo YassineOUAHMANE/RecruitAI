@@ -1,17 +1,18 @@
-from ingestion.parser import ResumeParser
-from embeddings.embedder import Embedder
-from storage.vector_store import VectorStore
+from ml_pipeline.ingestion.parser import ResumeParser
+from ml_pipeline.embeddings.embedder import Embedder
+from ml_pipeline.storage.vector_store import VectorStore
 
-
+from backend.config import get_db
+from backend.dao.files_dao import FilesDAO
 class RAGPipeline:
 
-    def __init__(self, base_path="/home/moussaoui/langchain-chatbot/data/data", model_embedding="all-MiniLM-L6-v2", vector_db="qdrant"):
+    def __init__(self, base_path="/app/data", vector_db="qdrant"):
         self.base_path = base_path
-        self.model_embedding = model_embedding
         self.vector_db = vector_db
+        self.files_dao = FilesDAO(get_db)   
 
         self.parser = ResumeParser(base_path=self.base_path)
-        self.embedder = Embedder(model_embedding=self.model_embedding)
+        self.embedder = Embedder()
         self.store = VectorStore(type=self.vector_db, dimension=384)
 
     def run(self):

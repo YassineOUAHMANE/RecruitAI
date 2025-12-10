@@ -41,7 +41,7 @@ class VectorStore:
             else:
                 print(f"Collection '{coll_name}' déjà existante.")
 
-            self.collection = coll_name  # conserve juste le nom pour upsert plus loin
+            self.collection = coll_name  
 
         else : 
             print("ERREUR   :: pas encore implémenté ce type de database !!")
@@ -114,7 +114,7 @@ class VectorStore:
     def getCollection(self):
         return self.collection
 
-    def get_backend(self):   # À corriger
+    def get_backend(self):   
         return  self.client,self.collection
         
 

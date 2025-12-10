@@ -40,7 +40,12 @@ class ConversationService():
         for file in response["files"]:
             self.file_in_text_dao.save(text_id,file)
         result=self.conversation_text_dao.get_by_text_id(text_id)
-        result["file_ids"]=result["file_ids"].split(",")
+        # file_ids peut être None si aucun fichier n’est lié
+        if result["file_ids"]:
+            result["file_ids"] = result["file_ids"].split(",")
+        else:
+            result["file_ids"] = []
+
         return result
 
     def create_conversation(self,user_input):

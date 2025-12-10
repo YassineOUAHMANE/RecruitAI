@@ -1,95 +1,94 @@
 from langchain.tools import tool
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
-import numpy as np
 from ml_pipeline.embeddings.embedder import Embedder
 from ml_pipeline.config.settings import settings
 
 
+
 class Retriever:
 
-
-    def __init__(self, collection_name= settings.QDRANT_COLLECTION, model_name="all-MiniLM-L6-v2"):
+    def __init__(self, collection_name=settings.QDRANT_COLLECTION):
         self.collection_name = collection_name
-        self.model_name = model_name
+
         self.client = QdrantClient(
-            host = settings.QDRANT_HOST,
-            port = settings.QDRANT_PORT,
-            prefer_grpc = True, 
-            grpc_port = settings.QDRANT_GRPC_PORT, 
-            timeout = 60.0
-            )
+            host=settings.QDRANT_HOST,
+            port=settings.QDRANT_PORT,
+            prefer_grpc=True,
+            grpc_port=settings.QDRANT_GRPC_PORT,
+            timeout=60.0
+        )
 
-        self.embedder = Embedder(model_embedding=self.model_name)
-
-
+        self.embedder = Embedder()
 
     def search(self, query: str, top_k: int = 5, category: str = None):
         """
-        Recherche les CV les plus pertinents pour une description de poste donnée.
-        Retourne une liste des meilleurs candidats trouvés.
+        Recherche les CV les plus pertinents dans Qdrant.
         """
 
-        query_vector = self.embedder.encodeText(query).tolist()
+        vector = self.embedder.encodeText(query).astype(float).tolist()
 
-        # filtre par type
         qdrant_filter = None
         if category:
             qdrant_filter = Filter(
-                must=[FieldCondition(key="category", match=MatchValue(value=category.upper()))]
+                must=[
+                    FieldCondition(
+                        key="category",
+                        match=MatchValue(value=category.upper())
+                    )
+                ]
             )
 
-        # Recherche dans Qdrant
-        results = self.client.search(
+        results = self.client.query_points(
             collection_name=self.collection_name,
-            query_vector=query_vector,
+            query=vector,
             limit=top_k,
-            query_filter=qdrant_filter,
+            query_filter=qdrant_filter
         )
-
-        # Mise en forme simple
         matches = []
-        for r in results:
-            payload = r.payload
+        for r in results.points:
             matches.append({
-                "category": payload.get("category", "Inconnue"),
+                "id": r.id,   
+                "category": r.payload.get("category"),
                 "score": r.score,
-                "text_preview": payload.get("text", "")[:250] + "..."
+                "text_preview": r.payload.get("text")[:250] + "..."
             })
+
+
+        
+
 
         return matches
 
+
 retriever = Retriever()
 
+
 @tool
-def rag(description_poste: str, top_k: int = 5, category: str = None):
-    """Recherche les CV les plus pertinents pour une description de poste donnée.
-
-    Args:
-        description_poste: description de l'offre d'emploi ou du poste
-        top_k: nombre de CV renvoyés, par défaut 5 si la personne ne le précise pas
-        category: la catégorie visée par l'offre
+def rag(description_poste: str, top_k: int = 5, category: str = None, message_id: str = None):
     """
-    
-    #print("appel de Rag \n")
+    Recherche les CV les plus pertinents pour une description de poste.
+    Utilisé par le LLM via LangChain.
+    Quand tu appelles la fonction `rag`, tu DOIS inclure le champ `message_id`.
+    La valeur du message_id doit être exactement celle fournie dans le message system sous la forme `message_id=<valeur>`.
 
-    #print(description_poste, "\n")
-    #print(top_k, "\n")
-    #print(category, "\n")
+    """
 
     results = retriever.search(description_poste, top_k=top_k, category=category)
 
     if not results:
-        return {"description_poste": description_poste, "top_profils": "Aucun CV trouvé."}
+        return {
+            "description_poste": description_poste,
+            "top_profils": "Aucun CV trouvé."
+        }
 
     profils_text = "\n".join([
-        f"- [{r['category']}] (score={r['score']}) : {r['text_preview']}"
+        f"- [{r['category']}] (score={round(r['score'], 3)}) : {r['text_preview']}"
         for r in results
     ])
 
-    #print("profile texts :", profils_text, "\n")
-
     return {
+        "message_id": message_id,
         "cv_ids": [r["id"] for r in results],
         "description_poste": description_poste,
         "top_profils": profils_text

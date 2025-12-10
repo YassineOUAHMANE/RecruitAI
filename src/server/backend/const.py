@@ -1,1 +1,1 @@
-UPLOAD_DIR = "./uploads"
+UPLOAD_DIR = "/app/uploads"
