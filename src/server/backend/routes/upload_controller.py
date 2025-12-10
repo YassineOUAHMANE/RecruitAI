@@ -10,8 +10,11 @@ class UploadController():
 
 
     def upload_user_cv(self,file: UploadFile = File(...)):
-        success=self.upload_service.manage_uploads(file)
-        return {"message":"success" if success else "upload failed"}
+        result = self.upload_service.manage_uploads(file)
+        if result["success"]:
+            return {"message":"success", "file_id": result["file_id"]}
+        else:
+            return {"message":"upload failed", "file_id": None}
     
     def get_file_content(self,file_id):
         filepath=self.upload_service.get_file_path(file_id)
