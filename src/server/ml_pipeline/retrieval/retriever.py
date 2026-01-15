@@ -51,7 +51,7 @@ class Retriever:
                 "id": r.id,   
                 "category": r.payload.get("category"),
                 "score": r.score,
-                "text_preview": r.payload.get("text")[:250] + "..."
+                "text_preview": r.payload.get("text") + "..."
             })
 
 
@@ -65,13 +65,13 @@ retriever = Retriever()
 
 
 @tool
-def rag(description_poste: str, top_k: int = 5, category: str = None, message_id: str = None):
+def rag(description_poste: str, top_k: int, category: str = None, message_id: str = None):
     """
     Recherche les CV les plus pertinents pour une description de poste.
     Utilisé par le LLM via LangChain.
     Quand tu appelles la fonction `rag`, tu DOIS inclure le champ `message_id`.
     La valeur du message_id doit être exactement celle fournie dans le message system sous la forme `message_id=<valeur>`.
-
+    Aussi, `top_k` est le nombre de CV que tu veux retirer de la base vectoriel , si le user ne choisis pas le `top_k` , prend `top_k`== 5  
     """
 
     results = retriever.search(description_poste, top_k=top_k, category=category)

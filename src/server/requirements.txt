@@ -17,3 +17,4 @@ numpy<2.0
 onnxruntime==1.19.2
 tokenizers==0.20.3
 
+joblib>=1.2.0

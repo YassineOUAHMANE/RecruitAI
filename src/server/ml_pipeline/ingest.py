@@ -28,10 +28,11 @@ def extract_text(pdf_path):
 from qdrant_client.models import VectorParams
 
 def ingest():
-    print("🚀 Démarrage de l’ingestion...")
+    print("Démarrage de l’ingestion...")
     base = Path(DATA_PATH)
 
     files_dao = FilesDAO(get_db)
+    files_dao.get(1)
     embedder = Embedder()
 
     qdrant = QdrantClient(
@@ -40,6 +41,11 @@ def ingest():
         prefer_grpc=True,
         grpc_port=settings.QDRANT_GRPC_PORT
     )
+    
+    
+    
+    
+    
 
     if qdrant.collection_exists(settings.QDRANT_COLLECTION):
         print("Collection déjà existante → STOP (pas d’ingestion)")
@@ -95,5 +101,5 @@ def ingest():
 
     print(f" Ingestion terminée : {counter} CV insérés !")
 
-if __name__ == "__main__":
-    ingest()
+# if __name__ == "__main__":
+#     ingest()

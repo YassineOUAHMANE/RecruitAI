@@ -1,2 +1,4 @@
 server/venv
 **/pycache/
+**/*.pdf
+.env

@@ -9,8 +9,7 @@ from pathlib import Path
 class Embedder:
     def __init__(self):
 
-        # Chemin réel du dossier embeddings/
-        BASE_DIR = Path(__file__).resolve().parent  # backend/embeddings/
+        BASE_DIR = Path(__file__).resolve().parent  
 
         model_path = BASE_DIR / "onnx_model/model.onnx"
         tokenizer_path = BASE_DIR / "onnx_model/tokenizer.json"
@@ -28,7 +27,6 @@ class Embedder:
         print(f"🔍 Chargement tokenizer : {tokenizer_path}")
         self.tokenizer = Tokenizer.from_file(str(tokenizer_path))
 
-    # ----------------------------------------------------------------------
 
     def encodeText(self, text: str):
         encoded = self.tokenizer.encode(text)
@@ -45,13 +43,11 @@ class Embedder:
 
         outputs = self.session.run(None, ort_inputs)
 
-        # On fait un mean pooling : (1, seq_len, 384) -> (384,)
         embedding = outputs[0].mean(axis=1)[0]
 
         return embedding
 
 
-    # ----------------------------------------------------------------------
 
     def encodeBatch(self, texts):
         ids = []
