@@ -1,33 +1,57 @@
-# Assistant RH 
+# Assistant RH – Lancement rapide
 
+## 1. Créer le fichier `.env`
 
+Créer un fichier `.env` dans   `src/.env`
 
-### 1. Créer l’environnement virtuel et installer les dépendances
-```bash
-python3 -m venv venv
-source venv/bin/activate  
-pip install -r requirements.txt
-```
-
-### 2. Lancer Qdrant avec Docker
-```bash
-docker run -d \
-  -p 6333:6333 \
-  -p 6334:6334 \
-  -v $(pwd)/qdrant_storage:/qdrant/storage \
-  qdrant/qdrant
-```
-
-### 3. Créer un fichier `.env` avec votre clé Mistral
 ```env
-MISTRAL_API_KEY=ta_clef_mistral
+MISTRAL_API_KEY=your_mistral_api_key_here
+
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_PROJECT=Assistant_RH
+LANGCHAIN_API_KEY=your_langchain_api_key_here
+
+DB_HOST=db
+DB_USER=root
+DB_PASSWORD=rootpassword
+DB_NAME=recruit_AI
+
+DATA_PATH=/app/data
+```
+
+
+---
+
+## 2. Lancer tous les services
+
+```bash
+docker compose up --build
 ```
 
 ---
 
-## Utilisation
+## 3. Accéder aux services
 
-Lancez le script principal :
+### Backend API (FastAPI)
+- http://localhost:8000
+
+### Frontend
+- http://localhost:8001
+
+Accès direct aux interfaces :
+- **HR Panel (recruteur)** : http://localhost:8001/hrpanel
+- **Candidate (dépôt de CV)** : http://localhost:8001/candidate
+
+
+### Qdrant (base vectorielle)
+- Collection : http://localhost:6333/dashboard#/collections
+
+---
+
+## 4. Arrêter les services
+
 ```bash
-python3 src/main.py
+docker compose down -v
 ```
+
+
