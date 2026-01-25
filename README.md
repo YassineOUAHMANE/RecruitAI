@@ -54,4 +54,20 @@ Accès direct aux interfaces :
 docker compose down -v
 ```
 
+---
+
+## 5. Application demo
+
+### Interface Chatbot
+![Interface Chatbot](Images/Interface-chatbot.png)
+
+### Base de Données Qdrant
+![Qdrant Database](Images/Qdrant-Database.png)
+
+### Visualisation CV Chatbot
+![Visualisation CV Chatbot](Images/visualisation-cv-chatbot.png)
+
+### Upload CV
+![Upload CV](Images/Upload-CV.png)
+
 
