@@ -55,8 +55,17 @@ docker compose down -v
 ```
 
 ---
-
-## 5. Application demo
+## 5. Workflow
+### Architecture Globale
+Vue d'ensemble du système, incluant le Frontend (React), le Backend (FastAPI), le pipeline ML (RAG, Mistral LLM), et la persistance des données (Qdrant, MySQL).
+![Workflow](Images/workflow.png)
+### Workflow Recruteur (HR Panel)
+Séquence des requêtes lorsqu'un recruteur interagit avec le chatbot pour interroger la base de CV via le pipeline RAG.
+![Workflow Recruiter](Images/workflow_recruteur.png)
+### Workflow Candidat (Dépôt de CV)
+Séquence d'ingestion d'un CV : de l'upload par le candidat à l'extraction de texte, la génération d'embeddings, et le stockage en base vectorielle.
+![Workflow User](Images/workflow_user.png)
+## 6. Application demo
 
 ### Interface Chatbot
 ![Interface Chatbot](Images/Interface-chatbot.png)
